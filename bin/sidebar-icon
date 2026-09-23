@@ -170,7 +170,7 @@ cmd_examples() {
 cmd_manager() {
   [ -x "$BUILD_MANAGER" ] || die "manager: script not found: $BUILD_MANAGER"
   "$BUILD_MANAGER"
-  echo "$PROG: built $HOME/Applications/Ficoni Manager.app"
+  echo "$PROG: built $HOME/Applications/Ficoni.app"
 }
 
 cmd_status() {

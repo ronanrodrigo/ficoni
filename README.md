@@ -22,10 +22,10 @@ Real Finder window, same folder and view, before and after installing the icons 
   <img src="assets/screenshot-finder-before-after.png" width="100%" alt="Finder window before and after: the Favorites rows for Developer, Downloads, Pictures and External change from plain blue folder icons to custom SF Symbol glyphs">
 </p>
 
-The Manager app — a real SwiftUI app listing every icon, its PlugInKit status, and a one-click Finder restart:
+The Ficoni app — a real SwiftUI app listing every icon, its PlugInKit status, and a one-click Finder restart:
 
 <p align="center">
-  <img src="assets/screenshot-manager.png" width="820" alt="Ficoni Manager window listing four sidebar icons, all active, with Edit and Remove buttons">
+  <img src="assets/screenshot-manager.png" width="820" alt="Ficoni window listing four sidebar icons, all active, with Edit and Remove buttons">
 </p>
 
 ## Install
