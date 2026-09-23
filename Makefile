@@ -5,7 +5,7 @@ LSR   := /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServ
 .PHONY: help manager icon examples status favorites symbols uninstall clean
 
 help:
-	@echo "make manager                build the Manager GUI (~/Applications/Ficoni Manager.app)"
+	@echo "make manager                build the Manager GUI (~/Applications/Ficoni.app)"
 	@echo "make examples               install every icon in examples/*.json"
 	@echo "make status                 list the Finder Sync extensions known to pkd"
 	@echo "make favorites              list the real paths behind the Finder sidebar favorites"
