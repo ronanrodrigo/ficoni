@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/hero-banner.png" width="100%" alt="FinderSidebarIcons">
+<img src="assets/hero-banner.png" width="100%" alt="Ficoni">
 
-# FinderSidebarIcons
+# Ficoni
 
 **Custom icons for any item in the macOS Finder sidebar.**
 
@@ -25,7 +25,7 @@ Real Finder window, same folder and view, before and after installing the icons 
 The Manager app — a real SwiftUI app listing every icon, its PlugInKit status, and a one-click Finder restart:
 
 <p align="center">
-  <img src="assets/screenshot-manager.png" width="820" alt="FinderSidebarIcons Manager window listing four sidebar icons, all active, with Edit and Remove buttons">
+  <img src="assets/screenshot-manager.png" width="820" alt="Ficoni Manager window listing four sidebar icons, all active, with Edit and Remove buttons">
 </p>
 
 ## Install

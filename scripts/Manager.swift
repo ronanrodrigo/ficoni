@@ -3,8 +3,8 @@ import AppKit
 
 // MARK: - Paths / helpers
 
-let appsDir = ("~/Applications/FinderSidebarIcons" as NSString).expandingTildeInPath
-let supportDir = ("~/Library/Application Support/FinderSidebarIcons" as NSString).expandingTildeInPath
+let appsDir = ("~/Applications/Ficoni" as NSString).expandingTildeInPath
+let supportDir = ("~/Library/Application Support/Ficoni" as NSString).expandingTildeInPath
 let lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 let bundlePrefix = "dev.ronanrodrigo.findericon"
 

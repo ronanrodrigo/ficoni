@@ -1,5 +1,5 @@
 #!/bin/bash
-# sidebar-icon — CLI wrapper for FinderSidebarIcons.
+# sidebar-icon — CLI wrapper for Ficoni.
 #
 # Gives a custom icon to a folder that lives in the macOS Finder sidebar, by
 # building a small Finder Sync helper app per folder (scripts/build_icon_app.sh).
@@ -48,7 +48,7 @@ elif [ -d "$HERE/../libexec/finder-sidebar-icons/scripts" ]; then
 elif [ -d "$HERE/../scripts" ]; then
   SCRIPTS="$(cd "$HERE/../scripts" && pwd)"
 else
-  echo "$PROG: cannot find the FinderSidebarIcons scripts." >&2
+  echo "$PROG: cannot find the Ficoni scripts." >&2
   echo "  looked in $HERE/../libexec/finder-sidebar-icons/scripts and $HERE/../scripts" >&2
   echo "  set SBI_LIBEXEC=/path/to/libexec/finder-sidebar-icons to override" >&2
   exit 1
@@ -59,7 +59,7 @@ BUILD_MANAGER="$SCRIPTS/build_manager.sh"
 INSTALL_EXAMPLES="$SCRIPTS/install_examples.sh"
 FAVLIST="$SCRIPTS/favlist.swift"
 
-APPS="${SBI_APPS_DIR:-$HOME/Applications/FinderSidebarIcons}"
+APPS="${SBI_APPS_DIR:-$HOME/Applications/Ficoni}"
 LSR=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 
 usage() {
@@ -170,7 +170,7 @@ cmd_examples() {
 cmd_manager() {
   [ -x "$BUILD_MANAGER" ] || die "manager: script not found: $BUILD_MANAGER"
   "$BUILD_MANAGER"
-  echo "$PROG: built $HOME/Applications/FinderSidebarIcons Manager.app"
+  echo "$PROG: built $HOME/Applications/Ficoni Manager.app"
 }
 
 cmd_status() {

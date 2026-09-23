@@ -1,7 +1,7 @@
 #!/bin/bash
 # build_manager.sh [--install]
 #
-# Builds "FinderSidebarIcons Manager.app" — the SwiftUI GUI that lists, adds,
+# Builds "Ficoni Manager.app" — the SwiftUI GUI that lists, adds,
 # edits and removes the sidebar icon apps — from scripts/Manager.swift.
 #
 # The app bundles the build script + extension sources in Contents/Resources so
@@ -9,7 +9,7 @@
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-NAME="FinderSidebarIcons Manager"
+NAME="Ficoni Manager"
 OUT="${1:-$HOME/Applications/$NAME.app}"
 BUNDLE_ID="dev.ronanrodrigo.finder-sidebar-icons.manager"
 WORK="$(mktemp -d)"
@@ -19,7 +19,7 @@ mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 
 swiftc -O -parse-as-library \
   -framework SwiftUI -framework Cocoa \
-  -o "$OUT/Contents/MacOS/FinderSidebarIconsManager" \
+  -o "$OUT/Contents/MacOS/FiconiManager" \
   "$HERE/Manager.swift"
 
 cp "$HERE/build_icon_app.sh" "$HERE/sync.swift" "$HERE/app.entitlements" \
@@ -36,7 +36,7 @@ cat > "$OUT/Contents/Info.plist" <<EOF
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 	<key>CFBundleDevelopmentRegion</key><string>en</string>
-	<key>CFBundleExecutable</key><string>FinderSidebarIconsManager</string>
+	<key>CFBundleExecutable</key><string>FiconiManager</string>
 	<key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
 	<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 	<key>CFBundleName</key><string>$NAME</string>
