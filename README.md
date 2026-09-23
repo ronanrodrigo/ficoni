@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/manager-icon-preview.png" width="180" alt="FinderSidebarIcons Manager icon">
+<img src="assets/banner.png" width="100%" alt="FinderSidebarIcons">
 
 # FinderSidebarIcons
 
@@ -32,6 +32,20 @@ flowchart LR
 ```
 
 The helper app never has to run. `pkd` loads the extension, the extension just declares the folder, and Finder draws the app's icon. Icons survive reboots.
+
+## What it looks like
+
+The sidebar after installing the four icons from `examples/` — the icons are bare tinted SF Symbols (`chevron.left.forwardslash.chevron.right`, `arrow.down.circle`, `photo`, `chair.lounge`), so they sit next to Finder's own rows without an app-icon plate behind them:
+
+<p align="center">
+  <img src="assets/screenshot-finder-sidebar.png" width="320" alt="macOS Finder sidebar with custom Developer, Downloads, Pictures and External icons">
+</p>
+
+The Manager app lists every icon, shows whether its extension is live in PlugInKit, and restarts Finder in one click:
+
+<p align="center">
+  <img src="assets/screenshot-manager.png" width="820" alt="FinderSidebarIcons Manager window listing four sidebar icons, all Ativo, with Editar and Remover buttons">
+</p>
 
 ## Install
 
@@ -144,7 +158,7 @@ scripts/
   make_sidebar_icon.swift# squircle app icon from an SF Symbol + sidebar_* templates
   app.entitlements       # app-sandbox entitlement used for both signatures
 examples/                # one JSON per sidebar icon
-assets/                  # pixel-art Manager icon
+assets/                  # pixel-art icon, green 16:9 banner, README screenshots
 ```
 
 State: helper apps in `~/Applications/FinderSidebarIcons/`, Manager config in
