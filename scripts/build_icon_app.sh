@@ -16,7 +16,7 @@
 # Env:
 #   BUNDLE_PREFIX   bundle-id prefix (default dev.ronanrodrigo.findericon)
 #   SYMBOLMODE      1 | 0, see above
-#   OUT             install dir (default ~/Applications/FinderSidebarIcons)
+#   OUT             install dir (default ~/Applications/Ficoni)
 set -e
 TAB=$'\t'
 NAME="$1"; TARGET="$2"; SUFFIX="$3"; SYMBOL="$4"; SYSICNS="$5"
@@ -37,7 +37,7 @@ else
 fi
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-OUT="${OUT:-$HOME/Applications/FinderSidebarIcons}"
+OUT="${OUT:-$HOME/Applications/Ficoni}"
 APP="$OUT/$NAME.app"
 APPID="${BUNDLE_PREFIX:-dev.ronanrodrigo.findericon}.$SUFFIX"
 EXTID="$APPID.sync"
