@@ -1,0 +1,244 @@
+#!/bin/bash
+# sidebar-icon — CLI wrapper for FinderSidebarIcons.
+#
+# Gives a custom icon to a folder that lives in the macOS Finder sidebar, by
+# building a small Finder Sync helper app per folder (scripts/build_icon_app.sh).
+#
+# Installed by Homebrew as `brew install ronanrodrigo/tap/finder-sidebar-icons`;
+# also runnable straight from a checkout (bin/sidebar-icon in the repo root).
+#
+# Usage:
+#   sidebar-icon add --name N --target PATH --symbol S
+#                    [--suffix X] [--symbolmode 0|1] [--system-icns PATH]
+#   sidebar-icon examples            build every icon in examples/*.json
+#   sidebar-icon manager             build the SwiftUI Manager.app
+#   sidebar-icon status              list the registered Finder Sync extensions
+#   sidebar-icon favorites           list the paths behind the Finder sidebar
+#   sidebar-icon remove NAME         remove one helper app + its extension
+#   sidebar-icon uninstall           remove every helper app + its extension
+#   sidebar-icon help                this text
+set -euo pipefail
+
+PROG="$(basename "$0")"
+
+# ---------------------------------------------------------------- locating bits
+# Resolve $0 through symlinks (Homebrew links bin/sidebar-icon into the prefix)
+# so the sibling libexec/ tree is found even when invoked via the symlink.
+resolve_path() {
+  local p="$1" t
+  while [ -L "$p" ]; do
+    t="$(readlink "$p")"
+    case "$t" in
+      /*) p="$t" ;;
+      *)  p="$(cd "$(dirname "$p")" && pwd)/$t" ;;
+    esac
+  done
+  printf '%s' "$p"
+}
+
+SELF="$(resolve_path "$0")"
+HERE="$(cd "$(dirname "$SELF")" && pwd)"
+
+# 1. explicit override, 2. Homebrew layout (<prefix>/libexec/finder-sidebar-icons),
+# 3. source checkout (<repo>/scripts).
+if [ -n "${SBI_LIBEXEC:-}" ]; then
+  SCRIPTS="$SBI_LIBEXEC/scripts"
+elif [ -d "$HERE/../libexec/finder-sidebar-icons/scripts" ]; then
+  SCRIPTS="$(cd "$HERE/../libexec/finder-sidebar-icons/scripts" && pwd)"
+elif [ -d "$HERE/../scripts" ]; then
+  SCRIPTS="$(cd "$HERE/../scripts" && pwd)"
+else
+  echo "$PROG: cannot find the FinderSidebarIcons scripts." >&2
+  echo "  looked in $HERE/../libexec/finder-sidebar-icons/scripts and $HERE/../scripts" >&2
+  echo "  set SBI_LIBEXEC=/path/to/libexec/finder-sidebar-icons to override" >&2
+  exit 1
+fi
+
+BUILD_ICON="$SCRIPTS/build_icon_app.sh"
+BUILD_MANAGER="$SCRIPTS/build_manager.sh"
+INSTALL_EXAMPLES="$SCRIPTS/install_examples.sh"
+FAVLIST="$SCRIPTS/favlist.swift"
+
+APPS="${SBI_APPS_DIR:-$HOME/Applications/FinderSidebarIcons}"
+LSR=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+
+usage() {
+  cat <<EOF
+$PROG — custom icons for Finder sidebar items (macOS Finder Sync helper apps)
+
+Usage:
+  $PROG add --name N --target PATH --symbol S [--suffix X] [--symbolmode 0|1] [--system-icns PATH]
+  $PROG examples
+  $PROG manager
+  $PROG status
+  $PROG favorites
+  $PROG remove NAME
+  $PROG uninstall
+  $PROG help
+
+add:
+  --name N          display name of the icon app (e.g. Projects)
+  --target PATH     folder whose sidebar row gets the icon
+  --symbol S        SF Symbol name (e.g. hammer)
+  --suffix X        bundle-id suffix (default: name lowercased, non-alnum -> -)
+  --symbolmode 1    native sidebar glyph (default when no --system-icns)
+  --symbolmode 0    classic app icon (generated squircle, or --system-icns)
+  --system-icns P   CoreTypes .icns to use as the app icon (implies --symbolmode 0)
+
+Examples:
+  $PROG add --name Projects --target ~/Projects --symbol hammer
+  $PROG add --name External --target /Volumes/External --symbol externaldrive \\
+              --system-icns /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarExternalDisk.icns
+  $PROG examples
+  $PROG status
+
+Helper apps are built (and codesigned) on this Mac into:
+  $APPS
+Scripts live in:
+  $SCRIPTS
+EOF
+}
+
+die() { echo "$PROG: $*" >&2; exit 2; }
+
+refresh_ui() {
+  killall pkd 2>/dev/null || true
+  sleep 2
+  killall Finder 2>/dev/null || true
+}
+
+# ------------------------------------------------------------------- subcommands
+cmd_add() {
+  local name="" target="" suffix="" symbol="" symbolmode="" sysicns=""
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --name)        [ $# -ge 2 ] || die "--name needs a value"; name="$2"; shift 2 ;;
+      --name=*)      name="${1#*=}"; shift ;;
+      --target)      [ $# -ge 2 ] || die "--target needs a value"; target="$2"; shift 2 ;;
+      --target=*)    target="${1#*=}"; shift ;;
+      --suffix)      [ $# -ge 2 ] || die "--suffix needs a value"; suffix="$2"; shift 2 ;;
+      --suffix=*)    suffix="${1#*=}"; shift ;;
+      --symbol)      [ $# -ge 2 ] || die "--symbol needs a value"; symbol="$2"; shift 2 ;;
+      --symbol=*)    symbol="${1#*=}"; shift ;;
+      --symbolmode)  [ $# -ge 2 ] || die "--symbolmode needs a value"; symbolmode="$2"; shift 2 ;;
+      --symbolmode=*) symbolmode="${1#*=}"; shift ;;
+      --system-icns) [ $# -ge 2 ] || die "--system-icns needs a value"; sysicns="$2"; shift 2 ;;
+      --system-icns=*) sysicns="${1#*=}"; shift ;;
+      -h|--help)     usage; exit 0 ;;
+      *)             die "unknown option for add: $1 (try '$PROG help')" ;;
+    esac
+  done
+
+  [ -n "$name" ]   || die "add: --name is required"
+  [ -n "$target" ] || die "add: --target is required"
+  [ -n "$symbol" ] || die "add: --symbol is required"
+
+  # ~ in the target path is expanded by build_icon_app.sh's caller, not by it.
+  case "$target" in "~"*) target="$HOME${target#\~}" ;; esac
+  if [ ! -d "$target" ]; then
+    die "add: target folder does not exist: $target"
+  fi
+  if [ ! -x "$BUILD_ICON" ]; then
+    die "add: build script not found or not executable: $BUILD_ICON"
+  fi
+
+  if [ -z "$suffix" ]; then
+    suffix="$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-')"
+    # strip trailing dashes without sed/awk
+    while [ "${suffix%-}" != "$suffix" ]; do suffix="${suffix%-}"; done
+  fi
+
+  if [ -n "$sysicns" ]; then
+    [ -f "$sysicns" ] || die "add: --system-icns not found: $sysicns"
+    [ -z "$symbolmode" ] && symbolmode=0
+  fi
+  if [ -z "$symbolmode" ]; then
+    symbolmode=1
+  fi
+  case "$symbolmode" in 0|1) ;; *) die "add: --symbolmode must be 0 or 1" ;; esac
+
+  echo "$PROG: building '$name' -> $target (symbol $symbol, mode $symbolmode)"
+  SYMBOLMODE="$symbolmode" "$BUILD_ICON" "$name" "$target" "$suffix" "$symbol" "$sysicns"
+}
+
+cmd_examples() {
+  [ -x "$INSTALL_EXAMPLES" ] || die "examples: script not found: $INSTALL_EXAMPLES"
+  "$INSTALL_EXAMPLES"
+}
+
+cmd_manager() {
+  [ -x "$BUILD_MANAGER" ] || die "manager: script not found: $BUILD_MANAGER"
+  "$BUILD_MANAGER"
+  echo "$PROG: built $HOME/Applications/FinderSidebarIcons Manager.app"
+}
+
+cmd_status() {
+  echo "helper apps: $APPS"
+  if [ -d "$APPS" ]; then
+    local app found=0
+    for app in "$APPS"/*.app; do
+      [ -e "$app" ] || continue
+      found=1
+      echo "  $(basename "$app")"
+    done
+    [ "$found" = "1" ] || echo "  (none)"
+  else
+    echo "  (directory does not exist yet)"
+  fi
+  echo
+  echo "Finder Sync extensions registered with pkd (+ = enabled):"
+  pluginkit -m -A -D -p com.apple.FinderSync 2>/dev/null | grep findericon \
+    || echo "  no sidebar icon extensions registered"
+}
+
+cmd_favorites() {
+  [ -f "$FAVLIST" ] || die "favorites: script not found: $FAVLIST"
+  swift "$FAVLIST" list
+}
+
+cmd_remove() {
+  local name="${1:-}"
+  [ -n "$name" ] || die "remove: needs an app name (see '$PROG status')"
+  local app="$APPS/$name.app"
+  [ -d "$app" ] || die "remove: no such app: $app"
+
+  pluginkit -r "$app/Contents/PlugIns/SidebarSync.appex" 2>/dev/null || true
+  "$LSR" -u "$app" 2>/dev/null || true
+  rm -rf "$app"
+  echo "$PROG: removed $app"
+  refresh_ui
+}
+
+cmd_uninstall() {
+  local app removed=0
+  if [ -d "$APPS" ]; then
+    for app in "$APPS"/*.app; do
+      [ -e "$app" ] || continue
+      pluginkit -r "$app/Contents/PlugIns/SidebarSync.appex" 2>/dev/null || true
+      "$LSR" -u "$app" 2>/dev/null || true
+      rm -rf "$app"
+      echo "$PROG: removed $app"
+      removed=1
+    done
+  fi
+  [ "$removed" = "1" ] || echo "$PROG: nothing to remove in $APPS"
+  refresh_ui
+  echo "$PROG: done. To remove the CLI itself: brew uninstall finder-sidebar-icons"
+}
+
+# --------------------------------------------------------------------------- main
+cmd="${1:-help}"
+[ $# -gt 0 ] && shift || true
+
+case "$cmd" in
+  add)        cmd_add "$@" ;;
+  examples)   cmd_examples "$@" ;;
+  manager)    cmd_manager "$@" ;;
+  status)     cmd_status "$@" ;;
+  favorites)  cmd_favorites "$@" ;;
+  remove)     cmd_remove "$@" ;;
+  uninstall)  cmd_uninstall "$@" ;;
+  help|-h|--help) usage ;;
+  *) echo "$PROG: unknown command: $cmd" >&2; echo >&2; usage >&2; exit 2 ;;
+esac
