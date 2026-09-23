@@ -35,10 +35,10 @@ The helper app never has to run. `pkd` loads the extension, the extension just d
 
 ## What it looks like
 
-The sidebar after installing the four icons from `examples/` — the icons are bare tinted SF Symbols (`chevron.left.forwardslash.chevron.right`, `arrow.down.circle`, `photo`, `chair.lounge`), so they sit next to Finder's own rows without an app-icon plate behind them:
+The custom icons are bare tinted SF Symbols, so they sit next to Finder's own rows without an app-icon plate behind them. Same Finder window — same folder, same view — before and after installing the four icons from `examples/`. The folders themselves are untouched: Finder keeps drawing its normal icons inside the window, only the sidebar rows change.
 
 <p align="center">
-  <img src="assets/screenshot-finder-sidebar.png" width="320" alt="macOS Finder sidebar with custom Developer, Downloads, Pictures and External icons">
+  <img src="assets/screenshot-finder-before-after.png" width="100%" alt="Finder window before and after: the Favorites rows for Developer, Downloads, Pictures and External change from plain blue folder icons to the custom SF Symbol glyphs (:&lt;/&gt;, down-arrow, camera, chair)">
 </p>
 
 The Manager app lists every icon, shows whether its extension is live in PlugInKit, and restarts Finder in one click:
