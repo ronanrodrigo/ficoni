@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.png" width="100%" alt="FinderSidebarIcons">
+<img src="assets/hero-banner.png" width="100%" alt="FinderSidebarIcons">
 
 # FinderSidebarIcons
 
