@@ -31,7 +31,7 @@ The Ficoni app — a real SwiftUI app listing every icon, its PlugInKit status, 
 ## Install
 
 ```bash
-brew install ronanrodrigo/tap/finder-sidebar-icons
+brew install ronanrodrigo/tap/ficoni
 ```
 
 Requires the Xcode command line tools (`xcode-select --install`) and an Apple Development signing identity for the extension signature (`security find-identity -v -p codesigning`).
@@ -39,8 +39,8 @@ Requires the Xcode command line tools (`xcode-select --install`) and an Apple De
 ### Without Homebrew
 
 ```bash
-git clone https://github.com/ronanrodrigo/finder-sidebar-icons.git
-cd finder-sidebar-icons
+git clone https://github.com/ronanrodrigo/ficoni.git
+cd ficoni
 make icon NAME=Developer TARGET="$HOME/Developer" SUFFIX=developer \
           SYMBOL=chevron.left.forwardslash.chevron.right
 make examples      # build every icon in examples/*.json
@@ -74,4 +74,4 @@ sidebar-icon uninstall
 
 ## License
 
-MIT © Ronan Rodrigo Nunes — [github.com/ronanrodrigo/finder-sidebar-icons](https://github.com/ronanrodrigo/finder-sidebar-icons)
+MIT © Ronan Rodrigo Nunes — [github.com/ronanrodrigo/ficoni](https://github.com/ronanrodrigo/ficoni)
