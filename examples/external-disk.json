@@ -1,0 +1,8 @@
+{
+  "name": "External",
+  "target": "/Volumes/External",
+  "suffix": "external",
+  "symbol": "externaldrive",
+  "symbolmode": "0",
+  "systemIcns": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarExternalDisk.icns"
+}

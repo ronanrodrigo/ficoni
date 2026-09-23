@@ -1,0 +1,7 @@
+{
+  "name": "Downloads",
+  "target": "~/Downloads",
+  "suffix": "downloads",
+  "symbol": "arrow.down.circle",
+  "symbolmode": "1"
+}

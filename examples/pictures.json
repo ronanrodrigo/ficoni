@@ -1,0 +1,7 @@
+{
+  "name": "Pictures",
+  "target": "~/Pictures",
+  "suffix": "pictures",
+  "symbol": "photo",
+  "symbolmode": "1"
+}
